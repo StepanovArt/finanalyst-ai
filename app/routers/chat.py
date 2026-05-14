@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 
 from app.schemas import ChatRequest, ChatResponse
 from app.services.llm import LLMProvider, Message, get_llm_provider
+from app.services.prompts import build_messages_with_system
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -12,7 +13,8 @@ async def chat(
     body: ChatRequest,
     llm: LLMProvider = Depends(get_llm_provider),
 ) -> ChatResponse | StreamingResponse:
-    messages = [Message(role=m.role, content=m.content) for m in body.messages]
+    raw = [Message(role=m.role, content=m.content) for m in body.messages]
+    messages = build_messages_with_system(raw)
 
     if body.stream:
         return StreamingResponse(
