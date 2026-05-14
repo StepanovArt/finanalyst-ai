@@ -18,5 +18,8 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379"
     conversation_ttl_seconds: int = 86400  # 24 hours
 
+    llm_timeout_seconds: float = 30.0
+    llm_max_attempts: int = 3
+
 
 settings = Settings()
