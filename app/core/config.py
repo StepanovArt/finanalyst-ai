@@ -15,5 +15,8 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434/v1"
     ollama_model: str = "llama3.2"
 
+    redis_url: str = "redis://localhost:6379"
+    conversation_ttl_seconds: int = 86400  # 24 hours
+
 
 settings = Settings()
