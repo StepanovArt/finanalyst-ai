@@ -41,13 +41,13 @@ finanalyst-ai/
 ### Stage 1 — FastAPI service with LLM
 - [x] 1.1 Repo init & CLAUDE.md
 - [x] 1.2 Basic FastAPI skeleton (pyproject.toml, app layout, /health, Docker)
-- [ ] 1.3 LLM Provider abstraction
-  - [ ] 1.3.1 base.py — abstract LLMProvider
-  - [ ] 1.3.2 openai_provider.py
-  - [ ] 1.3.3 ollama_provider.py
-  - [ ] 1.3.4 Dependency injection via Depends() + LLM_PROVIDER env var
-- [ ] 1.4 Chat endpoint (POST /chat)
-- [ ] 1.5 LangGraph agent integration
+- [x] 1.3 LLM Provider abstraction (base, OpenAI, Ollama, DI via Depends)
+- [x] 1.4 Pydantic schemas (Message, ChatRequest, ChatResponse, HealthResponse)
+- [x] 1.5 Financial analyst system prompt (prompts.py)
+- [x] 1.6 POST /chat endpoint
+- [x] 1.7 POST /chat/stream — SSE streaming
+- [ ] 1.8 Loguru logging setup (core/logging.py + request middleware)
+- [ ] 1.9 Tests (pytest-asyncio, /health + /chat)
 
 ### Stage 2 — RAG pipeline
 - [ ] 2.1 SEC EDGAR ingestion (fetch 10-Q / 10-K)
