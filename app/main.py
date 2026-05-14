@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 
+from app.core.config import settings
 from app.routers import health
 
-app = FastAPI(title="FinAnalyst AI", version="0.1.0")
+app = FastAPI(title=settings.app_name, version="0.1.0")
 
 app.include_router(health.router)
