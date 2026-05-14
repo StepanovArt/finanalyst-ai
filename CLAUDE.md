@@ -36,14 +36,24 @@ finanalyst-ai/
 - No unnecessary comments — only non-obvious WHY
 - No mocking internal services in tests; prefer real dependencies where feasible
 
-## Task Roadmap — Stage 1
+## Task Roadmap
+
+### Stage 1 — FastAPI service with LLM
 - [x] 1.1 Repo init & CLAUDE.md
-- [ ] 1.2 Basic FastAPI skeleton
-  - [x] 1.2.1 pyproject.toml with uv
-  - [ ] 1.2.2 app/ folder structure
-  - [ ] 1.2.3 GET /health endpoint
-  - [ ] 1.2.4 Dockerfile + docker-compose
-- [ ] 1.3 SEC filing ingestion pipeline
-- [ ] 1.4 Qdrant integration (RAG)
-- [ ] 1.5 LangGraph agent
-- [ ] 1.6 LoRA fine-tuning pipeline
+- [x] 1.2 Basic FastAPI skeleton (pyproject.toml, app layout, /health, Docker)
+- [ ] 1.3 LLM Provider abstraction
+  - [ ] 1.3.1 base.py — abstract LLMProvider
+  - [ ] 1.3.2 openai_provider.py
+  - [ ] 1.3.3 ollama_provider.py
+  - [ ] 1.3.4 Dependency injection via Depends() + LLM_PROVIDER env var
+- [ ] 1.4 Chat endpoint (POST /chat)
+- [ ] 1.5 LangGraph agent integration
+
+### Stage 2 — RAG pipeline
+- [ ] 2.1 SEC EDGAR ingestion (fetch 10-Q / 10-K)
+- [ ] 2.2 Parsing & chunking
+- [ ] 2.3 Qdrant integration (embeddings + vector search)
+- [ ] 2.4 RAG agent with LangGraph
+
+### Stage 3 — Fine-tuning
+- [ ] 3.1 LoRA fine-tuning with Unsloth
