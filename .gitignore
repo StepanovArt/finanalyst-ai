@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Environment variables (СЕКРЕТЫ!)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (не коммитим тяжёлые файлы)
+*.pdf
+data/raw/
+data/processed/
+
+# Models (LoRA-адаптеры могут быть большими)
+*.bin
+*.safetensors
+checkpoints/
+
+# Node (для Claude Code)
+node_modules/
+
+# Qdrant data
+qdrant_data/
