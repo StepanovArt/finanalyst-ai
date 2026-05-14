@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 1: FastAPI Service with LLM**
 
-**Current Task:** 1.8 — Conversation history with Redis
+**Current Task:** 1.9 — Reliability layer
 
 **Completed:**
 - [x] 1.1 — Project initialization (git, GitHub, CLAUDE.md, README.md, .gitignore)
@@ -108,9 +108,9 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 1.5 — Financial domain system prompt
 - [x] 1.6 — /chat endpoint
 - [x] 1.7 — Streaming via SSE (POST /chat/stream)
+- [x] 1.8 — Conversation history with Redis
 
 **Up Next:**
-- [ ] 1.8 — Conversation history with Redis
 - [ ] 1.9 — Reliability layer (retries, timeouts, circuit breaker)
 - [ ] 1.10 — Rate limiting
 - [ ] 1.11 — Basic prompt injection defense
