@@ -5,7 +5,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.core.config import settings
-from app.core.exceptions import LLMError, LLMRateLimitError, LLMTimeoutError, LLMUnavailableError
+from app.core.exceptions import LLMError, LLMRateLimitError, LLMTimeoutError, LLMUnavailableError, PromptInjectionError
 from app.routers import chat, health
 
 limiter = Limiter(key_func=get_remote_address, storage_uri=settings.redis_url)
@@ -36,3 +36,8 @@ async def llm_unavailable_handler(_: Request, exc: LLMUnavailableError) -> JSONR
 @app.exception_handler(LLMError)
 async def llm_error_handler(_: Request, exc: LLMError) -> JSONResponse:
     return JSONResponse(status_code=502, content={"detail": "LLM provider returned an unexpected error."})
+
+
+@app.exception_handler(PromptInjectionError)
+async def prompt_injection_handler(_: Request, exc: PromptInjectionError) -> JSONResponse:
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
