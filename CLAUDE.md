@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 1: FastAPI Service with LLM**
 
-**Current Task:** 1.13 — Tests (60%+ coverage)
+**Current Task:** 1.15 — GitHub Actions CI
 
 **Completed:**
 - [x] 1.1 — Project initialization (git, GitHub, CLAUDE.md, README.md, .gitignore)
@@ -113,10 +113,10 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 1.10 — Rate limiting (slowapi + Redis)
 - [x] 1.11 — Basic prompt injection defense
 - [x] 1.12 — Structured logging with request_id
+- [x] 1.13 — Tests (18 tests, 73% coverage)
+- [x] 1.14 — Docker + docker-compose (uv.lock, .dockerignore, Redis volume)
 
 **Up Next:**
-- [ ] 1.13 — Tests (60%+ coverage)
-- [ ] 1.14 — Docker + docker-compose
 - [ ] 1.15 — GitHub Actions CI
 - [ ] 1.16 — README documentation
 
