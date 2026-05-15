@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 1: FastAPI Service with LLM**
 
-**Current Task:** 1.15 — GitHub Actions CI
+**Current Task:** Stage 1 Complete ✅
 
 **Completed:**
 - [x] 1.1 — Project initialization (git, GitHub, CLAUDE.md, README.md, .gitignore)
@@ -116,9 +116,8 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 1.13 — Tests (18 tests, 73% coverage)
 - [x] 1.14 — Docker + docker-compose (uv.lock, .dockerignore, Redis volume)
 
-**Up Next:**
-- [ ] 1.15 — GitHub Actions CI
-- [ ] 1.16 — README documentation
+- [x] 1.15 — GitHub Actions CI (ruff + pytest --cov-fail-under=60)
+- [x] 1.16 — README documentation
 
 DO NOT TOUCH (Этап 2 и 3):
 - LangGraph, Qdrant, embeddings, fine-tuning
