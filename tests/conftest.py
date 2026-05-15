@@ -1,9 +1,11 @@
 from collections.abc import AsyncIterator
 
+import fakeredis
 import pytest
-import fakeredis.aioredis
 from httpx import ASGITransport, AsyncClient
 
+import app.core.limiter as limiter_module
+from app.core.circuit_breaker import NullCircuitBreaker
 from app.main import app
 from app.services.conversation import ConversationService, get_conversation_service
 from app.services.llm.base import LLMProvider, Message
@@ -28,12 +30,23 @@ def mock_llm() -> MockLLMProvider:
 
 
 @pytest.fixture
-def fake_redis() -> fakeredis.aioredis.FakeRedis:
-    return fakeredis.aioredis.FakeRedis(decode_responses=True)
+def fake_redis() -> fakeredis.FakeAsyncRedis:
+    return fakeredis.FakeAsyncRedis(decode_responses=True)
+
+
+@pytest.fixture(autouse=True)
+def patch_infrastructure(monkeypatch: pytest.MonkeyPatch) -> None:
+    # disable Redis-backed rate limiter
+    monkeypatch.setattr(limiter_module.limiter, "enabled", False, raising=False)
+
+    # replace Redis-backed circuit breakers with no-ops
+    null_cb = NullCircuitBreaker()
+    monkeypatch.setattr("app.services.llm.openai_provider._openai_circuit_breaker", lambda: null_cb)
+    monkeypatch.setattr("app.services.llm.ollama_provider._ollama_circuit_breaker", lambda: null_cb)
 
 
 @pytest.fixture
-async def client(mock_llm: MockLLMProvider, fake_redis: fakeredis.aioredis.FakeRedis) -> AsyncIterator[AsyncClient]:
+async def client(mock_llm: MockLLMProvider, fake_redis: fakeredis.FakeAsyncRedis) -> AsyncIterator[AsyncClient]:
     app.dependency_overrides[get_llm_provider] = lambda: mock_llm
     app.dependency_overrides[get_conversation_service] = lambda: ConversationService(fake_redis)
 

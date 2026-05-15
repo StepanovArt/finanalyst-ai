@@ -4,7 +4,7 @@ from app.core.exceptions import PromptInjectionError
 from app.schemas import Message
 
 _INJECTION_PATTERNS = re.compile(
-    r"ignore (all |previous |prior |above |your )?(instructions|rules|prompt|context|system)"
+    r"ignore\s+(\w+\s+){0,3}(instructions|rules|prompt|context|system)"
     r"|forget (everything|all|your instructions|who you are)"
     r"|you are now\b"
     r"|act as (if you are|though you are|a )?"
