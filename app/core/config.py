@@ -21,5 +21,8 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 30.0
     llm_max_attempts: int = 3
 
+    rate_limit_chat: str = "20/minute"
+    rate_limit_stream: str = "10/minute"
+
 
 settings = Settings()

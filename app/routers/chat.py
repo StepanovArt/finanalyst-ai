@@ -1,9 +1,11 @@
 import json
 from collections.abc import AsyncIterator
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
+from app.core.config import settings
+from app.main import limiter
 from app.schemas import ChatRequest, ChatResponse
 from app.services.conversation import ConversationService, get_conversation_service
 from app.services.llm import LLMProvider, Message, get_llm_provider
@@ -13,7 +15,9 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.post("", response_model=ChatResponse)
+@limiter.limit(settings.rate_limit_chat)
 async def chat(
+    request: Request,
     body: ChatRequest,
     llm: LLMProvider = Depends(get_llm_provider),
     conv: ConversationService = Depends(get_conversation_service),
@@ -34,16 +38,16 @@ async def chat(
     return ChatResponse(content=content, model=type(llm).__name__)
 
 
-async def _sse_generator(
-    llm: LLMProvider, messages: list[Message]
-) -> AsyncIterator[str]:
+async def _sse_generator(llm: LLMProvider, messages: list[Message]) -> AsyncIterator[str]:
     async for token in llm.stream_generate(messages):
         yield f"data: {json.dumps({'content': token})}\n\n"
     yield "data: [DONE]\n\n"
 
 
 @router.post("/stream")
+@limiter.limit(settings.rate_limit_stream)
 async def chat_stream(
+    request: Request,
     body: ChatRequest,
     llm: LLMProvider = Depends(get_llm_provider),
 ) -> StreamingResponse:
