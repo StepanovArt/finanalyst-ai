@@ -16,3 +16,7 @@ class LLMUnavailableError(LLMError):
 
 class ConversationNotFoundError(Exception):
     """Requested conversation_id does not exist in storage."""
+
+
+class PromptInjectionError(Exception):
+    """User message contains suspected prompt injection."""
