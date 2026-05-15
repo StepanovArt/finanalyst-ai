@@ -12,6 +12,16 @@ class CircuitState(Enum):
     HALF_OPEN = "half_open"  # cooldown passed — one request allowed through
 
 
+class NullCircuitBreaker:
+    """No-op circuit breaker for use in tests."""
+
+    async def __aenter__(self) -> "NullCircuitBreaker":
+        return self
+
+    async def __aexit__(self, *_: object) -> bool:
+        return False
+
+
 class CircuitBreaker:
     """Redis-backed circuit breaker for external service calls.
 

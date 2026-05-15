@@ -1,12 +1,12 @@
 import pytest
-import fakeredis.aioredis
+import fakeredis
 
 from app.services.conversation import ConversationService
 from app.services.llm.base import Message
 
 
 @pytest.fixture
-def svc(fake_redis: fakeredis.aioredis.FakeRedis) -> ConversationService:
+def svc(fake_redis: fakeredis.FakeAsyncRedis) -> ConversationService:
     return ConversationService(fake_redis)
 
 
