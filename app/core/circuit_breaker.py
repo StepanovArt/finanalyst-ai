@@ -7,8 +7,8 @@ from app.core.exceptions import LLMUnavailableError
 
 
 class CircuitState(Enum):
-    CLOSED = "closed"      # normal — requests pass through
-    OPEN = "open"          # too many failures — requests blocked
+    CLOSED = "closed"  # normal — requests pass through
+    OPEN = "open"  # too many failures — requests blocked
     HALF_OPEN = "half_open"  # cooldown passed — one request allowed through
 
 

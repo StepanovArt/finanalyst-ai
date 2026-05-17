@@ -1,5 +1,5 @@
-import pytest
 import fakeredis
+import pytest
 
 from app.services.conversation import ConversationService
 from app.services.llm.base import Message
