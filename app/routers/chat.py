@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
 from app.core.config import settings
-from app.main import limiter
+from app.core.limiter import limiter
 from app.schemas import ChatRequest, ChatResponse
 from app.services.conversation import ConversationService, get_conversation_service
 from app.services.guard import check_messages

@@ -1,9 +1,10 @@
-import pytest
 from httpx import AsyncClient
 
 
 async def test_chat_returns_response(client: AsyncClient) -> None:
-    response = await client.post("/chat", json={"messages": [{"role": "user", "content": "What is revenue?"}]})
+    response = await client.post(
+        "/chat", json={"messages": [{"role": "user", "content": "What is revenue?"}]}
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["content"] == "Mock response"

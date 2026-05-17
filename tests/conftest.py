@@ -46,7 +46,9 @@ def patch_infrastructure(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture
-async def client(mock_llm: MockLLMProvider, fake_redis: fakeredis.FakeAsyncRedis) -> AsyncIterator[AsyncClient]:
+async def client(
+    mock_llm: MockLLMProvider, fake_redis: fakeredis.FakeAsyncRedis
+) -> AsyncIterator[AsyncClient]:
     app.dependency_overrides[get_llm_provider] = lambda: mock_llm
     app.dependency_overrides[get_conversation_service] = lambda: ConversationService(fake_redis)
 
