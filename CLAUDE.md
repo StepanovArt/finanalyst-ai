@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.2.4 — Reranker: BAAI/bge-reranker-v2-m3
+**Current Task:** 2.2.5 — POST /documents/upload endpoint with background processing
 
 ---
 
@@ -136,7 +136,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 2.2.1 — Embeddings: BAAI/bge-m3 via FlagEmbedding (dense 1024d + sparse)
 - [x] 2.2.2 — Qdrant: Docker setup, collection schema with metadata filters
 - [x] 2.2.3 — Hybrid Search: dense + sparse via Reciprocal Rank Fusion
-- [ ] 2.2.4 — Reranker: BAAI/bge-reranker-v2-m3
+- [x] 2.2.4 — Reranker: BAAI/bge-reranker-v2-m3
 - [ ] 2.2.5 — POST /documents/upload endpoint with background processing
 
 #### 2.3 Agentic Layer

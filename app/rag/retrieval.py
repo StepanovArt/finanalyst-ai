@@ -6,6 +6,11 @@ Strategy: Reciprocal Rank Fusion (RRF) over dense + sparse results.
 - Sparse search → keyword match (finds exact tickers, metrics, GAAP terms)
 - RRF           → merges ranked lists: score = Σ 1/(k + rank_i)
 
+Optional second pass: cross-encoder reranker (bge-reranker-v2-m3).
+- Processes (query, document) jointly — sees both at once, much more accurate
+- Slower than bi-encoder but only runs on the small RRF candidate set
+- Enable with rerank=True in search()
+
 Why RRF over weighted sum?
 Rank-based fusion is more robust than score-based because dense and sparse
 scores live on different scales — a weight that works for one query breaks
@@ -13,8 +18,9 @@ for another. RRF only uses rank positions, which are stable across queries.
 """
 
 from dataclasses import dataclass
+from functools import lru_cache
 
-from FlagEmbedding import BGEM3FlagModel
+from FlagEmbedding import BGEM3FlagModel, FlagReranker
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     FieldCondition,
@@ -28,8 +34,14 @@ from qdrant_client.models import (
 
 from app.rag.vector_store import COLLECTION_NAME, QDRANT_URL
 
-PREFETCH_LIMIT = 20  # candidates per vector type before RRF
+PREFETCH_LIMIT = 20   # candidates per vector type before RRF
+RERANK_POOL = 20      # RRF candidates to pass to cross-encoder when reranking
 MAX_LENGTH = 512
+
+
+@lru_cache(maxsize=1)
+def _get_reranker() -> FlagReranker:
+    return FlagReranker("BAAI/bge-reranker-v2-m3", use_fp16=True)
 
 
 @dataclass
@@ -95,19 +107,24 @@ class HybridRetriever:
         query: str,
         limit: int = 5,
         filters: dict | None = None,
+        rerank: bool = False,
     ) -> list[SearchResult]:
-        """Run hybrid search with RRF fusion.
+        """Run hybrid search with RRF fusion and optional cross-encoder reranking.
 
         Args:
             query: natural language question
             limit: number of results to return
             filters: optional metadata filter e.g. {"ticker": "AAPL", "year": 2024}
+            rerank: if True, re-score top candidates with bge-reranker-v2-m3
 
         Returns:
-            list of SearchResult ordered by RRF score (best first)
+            list of SearchResult ordered by score (best first)
         """
         dense_vec, sparse_vec = self._embed_query(query)
         qdrant_filter = _build_filter(filters or {})
+
+        # Fetch more candidates when reranking so the cross-encoder has a richer pool
+        fetch_limit = RERANK_POOL if rerank else limit
 
         results = self._client.query_points(
             collection_name=COLLECTION_NAME,
@@ -126,7 +143,7 @@ class HybridRetriever:
                 ),
             ],
             query=FusionQuery(fusion=Fusion.RRF),
-            limit=limit,
+            limit=fetch_limit,
             with_payload=True,
         )
 
@@ -147,4 +164,17 @@ class HybridRetriever:
                     context_prefix=p.get("context_prefix", ""),
                 )
             )
-        return hits
+
+        if not rerank:
+            return hits
+
+        # Cross-encoder reranking: process (query, doc) pairs jointly
+        reranker = _get_reranker()
+        pairs = [[query, h.text] for h in hits]
+        scores: list[float] = reranker.compute_score(pairs, normalize=True)
+
+        for hit, score in zip(hits, scores):
+            hit.score = float(score)
+
+        hits.sort(key=lambda h: h.score, reverse=True)
+        return hits[:limit]
