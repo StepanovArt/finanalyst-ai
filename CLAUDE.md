@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.1.5 — Contextual Retrieval
+**Current Task:** 2.2.1 — Embeddings: BAAI/bge-m3
 
 ---
 
@@ -130,7 +130,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 2.1.2 — HTML parsing: BeautifulSoup + lxml (EDGAR filings are HTML, not PDF)
 - [x] 2.1.3 — Structured chunking by report sections (Income Statement, Balance Sheet, MD&A)
 - [x] 2.1.4 — Doc-level metadata (company, ticker, year, quarter, report type, currency)
-- [ ] 2.1.5 — Contextual Retrieval: LLM-generated context prefix for each chunk
+- [x] 2.1.5 — Contextual Retrieval: LLM-generated context prefix for each chunk
 
 #### 2.2 Basic Retrieval
 - [ ] 2.2.1 — Embeddings: BAAI/bge-m3 via sentence-transformers
