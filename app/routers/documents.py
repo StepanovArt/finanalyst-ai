@@ -8,7 +8,7 @@ GET  /documents/status/{job_id} — poll indexing progress
 from fastapi import APIRouter, BackgroundTasks, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from app.services.indexing import JobStatus, IndexingJob, job_store, run_indexing_job
+from app.services.indexing import IndexingJob, JobStatus, job_store, run_indexing_job
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -67,7 +67,9 @@ async def upload_document(
 
     return UploadResponse(
         job_id=job_id,
-        message=f"Indexing started for {ticker.upper()} {filing_type}. Poll /documents/status/{job_id}",
+        message=(
+            f"Indexing started for {ticker.upper()} {filing_type}. Poll /documents/status/{job_id}"
+        ),
     )
 
 

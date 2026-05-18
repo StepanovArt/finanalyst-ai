@@ -9,8 +9,8 @@ move to Redis, but a single-process server is sufficient here.
 
 import asyncio
 import uuid
-from dataclasses import dataclass, field
-from enum import Enum
+from dataclasses import dataclass
+from enum import StrEnum
 
 from loguru import logger
 
@@ -22,7 +22,7 @@ from app.rag.vector_store import COLLECTION_NAME, QDRANT_URL, get_client
 MAX_CHUNK_ID_OFFSET = 10_000_000  # avoid colliding with batch-indexed points
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     PENDING = "pending"
     PROCESSING = "processing"
     DONE = "done"
@@ -50,9 +50,7 @@ class JobStore:
     async def create(self, ticker: str, filing_type: str) -> str:
         job_id = str(uuid.uuid4())
         async with self._lock:
-            self._jobs[job_id] = IndexingJob(
-                job_id=job_id, ticker=ticker, filing_type=filing_type
-            )
+            self._jobs[job_id] = IndexingJob(job_id=job_id, ticker=ticker, filing_type=filing_type)
         return job_id
 
     async def get(self, job_id: str) -> IndexingJob | None:
@@ -96,9 +94,7 @@ async def run_indexing_job(
         logger.info(f"[{job_id}] {len(contextual)} chunks ready, starting embedding")
 
         # --- embed + upsert in a thread (CPU-bound) ---
-        await asyncio.get_event_loop().run_in_executor(
-            None, _embed_and_upsert, job_id, contextual
-        )
+        await asyncio.get_event_loop().run_in_executor(None, _embed_and_upsert, job_id, contextual)
 
         job.chunks_done = job.chunks_total
         job.status = JobStatus.DONE
@@ -125,6 +121,7 @@ def _embed_and_upsert(job_id: str, contextual: list) -> None:
 
     # Use a UUID-based offset so uploaded points don't collide with batch-indexed ones
     import hashlib
+
     id_offset = int(hashlib.md5(job_id.encode()).hexdigest(), 16) % MAX_CHUNK_ID_OFFSET
 
     for start in range(0, len(contextual), BATCH_SIZE):
