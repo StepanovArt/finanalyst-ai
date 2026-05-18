@@ -30,7 +30,6 @@ def main() -> None:
     print(f"\nCollection info:")
     print(f"  status:        {info['status']}")
     print(f"  points_count:  {info['points_count']}")
-    print(f"  vectors_count: {info['vectors_count']}")
     print(f"\nQdrant UI: {args.url}/dashboard")
 
 
