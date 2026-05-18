@@ -137,6 +137,42 @@ def _detect_currency(text: str) -> str:
     return "USD"
 
 
+def parse_filing_content(
+    raw: str,
+    ticker: str,
+    filing_type: str,
+    accession: str = "uploaded",
+) -> FilingDocument:
+    """Parse raw SGML content (e.g. from an uploaded file) into a FilingDocument.
+
+    Args:
+        raw: full-submission.txt content as a string
+        ticker: company ticker symbol (e.g. "AAPL")
+        filing_type: "10-K" or "10-Q"
+        accession: accession number or placeholder
+
+    Returns:
+        FilingDocument with extracted text and tables
+    """
+    period = _parse_period(raw)
+    company = _parse_company(raw)
+
+    html_content = _extract_main_document(raw, filing_type)
+    soup = BeautifulSoup(html_content, "lxml")
+    text = _extract_text(soup)
+
+    return FilingDocument(
+        ticker=ticker.upper(),
+        filing_type=filing_type,
+        accession=accession,
+        period=period,
+        company=company,
+        currency=_detect_currency(text),
+        text=text,
+        tables=_parse_tables(soup),
+    )
+
+
 def parse_filing(path: Path) -> FilingDocument:
     """Parse a full-submission.txt file into a FilingDocument.
 
