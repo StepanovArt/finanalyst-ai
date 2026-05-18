@@ -30,6 +30,8 @@ data = [
     "sec-edgar-downloader>=5.0.0",
     "beautifulsoup4>=4.12.0",
     "lxml>=5.2.0",
+    "FlagEmbedding>=1.2.0",
+    "torch>=2.0.0",
 ]
 
 [build-system]
