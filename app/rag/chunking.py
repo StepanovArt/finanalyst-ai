@@ -56,16 +56,39 @@ _RELEVANT_SECTIONS = {
 }
 
 
+def _derive_year(period: str) -> int:
+    """Extract year from YYYYMMDD period string."""
+    return int(period[:4])
+
+
+def _derive_quarter(period: str, filing_type: str) -> str:
+    """Derive fiscal quarter label from period and filing type.
+
+    10-K is always FY. For 10-Q we map period end month to quarter:
+    Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec.
+    Note: this is calendar-quarter approximation; actual fiscal quarter
+    depends on the company's fiscal year end.
+    """
+    if filing_type == "10-K":
+        return "FY"
+    month = int(period[4:6])
+    return f"Q{(month - 1) // 3 + 1}"
+
+
 @dataclass
 class Chunk:
     """A single retrieval unit from a filing."""
 
     id: str
     ticker: str
+    company: str
     filing_type: str
     period: str
+    year: int
+    quarter: str
     accession: str
     section: str
+    currency: str
     text: str
     chunk_index: int
 
@@ -73,10 +96,14 @@ class Chunk:
         return {
             "id": self.id,
             "ticker": self.ticker,
+            "company": self.company,
             "filing_type": self.filing_type,
             "period": self.period,
+            "year": self.year,
+            "quarter": self.quarter,
             "accession": self.accession,
             "section": self.section,
+            "currency": self.currency,
             "text": self.text,
             "chunk_index": self.chunk_index,
         }
@@ -157,10 +184,14 @@ def chunk_document(doc: FilingDocument) -> list[Chunk]:
                 Chunk(
                     id=chunk_id,
                     ticker=doc.ticker,
+                    company=doc.company,
                     filing_type=doc.filing_type,
                     period=doc.period,
+                    year=_derive_year(doc.period),
+                    quarter=_derive_quarter(doc.period, doc.filing_type),
                     accession=doc.accession,
                     section=section_name,
+                    currency=doc.currency,
                     text=window_text,
                     chunk_index=idx,
                 )
