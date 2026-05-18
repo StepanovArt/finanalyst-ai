@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.1.1 — Download SEC EDGAR filings
+**Current Task:** 2.1.2 — PDF parsing
 
 ---
 
@@ -126,7 +126,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 ### Stage 2 — Agentic RAG
 
 #### 2.1 Data Collection & Preparation
-- [ ] 2.1.1 — Download 20-30 SEC EDGAR filings (10-Q, 10-K) for 5-7 companies
+- [x] 2.1.1 — Download 20-30 SEC EDGAR filings (10-Q, 10-K) for 5-7 companies
 - [ ] 2.1.2 — PDF parsing: PyMuPDF for text, pdfplumber for tables
 - [ ] 2.1.3 — Structured chunking by report sections (Income Statement, Balance Sheet, MD&A)
 - [ ] 2.1.4 — Doc-level metadata (company, ticker, year, quarter, report type, currency)
