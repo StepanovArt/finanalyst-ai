@@ -1,0 +1,150 @@
+"""
+Hybrid search over SEC filings using Qdrant.
+
+Strategy: Reciprocal Rank Fusion (RRF) over dense + sparse results.
+- Dense search  → semantic similarity (finds paraphrases, synonyms)
+- Sparse search → keyword match (finds exact tickers, metrics, GAAP terms)
+- RRF           → merges ranked lists: score = Σ 1/(k + rank_i)
+
+Why RRF over weighted sum?
+Rank-based fusion is more robust than score-based because dense and sparse
+scores live on different scales — a weight that works for one query breaks
+for another. RRF only uses rank positions, which are stable across queries.
+"""
+
+from dataclasses import dataclass
+
+from FlagEmbedding import BGEM3FlagModel
+from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    FieldCondition,
+    Filter,
+    Fusion,
+    FusionQuery,
+    MatchValue,
+    Prefetch,
+    SparseVector,
+)
+
+from app.rag.vector_store import COLLECTION_NAME, QDRANT_URL
+
+PREFETCH_LIMIT = 20  # candidates per vector type before RRF
+MAX_LENGTH = 512
+
+
+@dataclass
+class SearchResult:
+    chunk_id: str
+    score: float
+    ticker: str
+    company: str
+    filing_type: str
+    year: int
+    quarter: str
+    section: str
+    text: str
+    context_prefix: str
+
+
+def _build_filter(filters: dict) -> Filter | None:
+    """Build Qdrant filter from a plain dict of {field: value}."""
+    if not filters:
+        return None
+    conditions = [
+        FieldCondition(key=k, match=MatchValue(value=v)) for k, v in filters.items()
+    ]
+    return Filter(must=conditions)
+
+
+class HybridRetriever:
+    """Retrieves SEC filing chunks via hybrid dense+sparse search with RRF."""
+
+    def __init__(
+        self,
+        qdrant_url: str = QDRANT_URL,
+        model: BGEM3FlagModel | None = None,
+    ) -> None:
+        self._client = QdrantClient(url=qdrant_url)
+        # Accept an injected model (avoids reloading in scripts that already have it)
+        self._model = model
+
+    def _get_model(self) -> BGEM3FlagModel:
+        if self._model is None:
+            self._model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
+        return self._model
+
+    def _embed_query(self, query: str) -> tuple[list[float], SparseVector]:
+        model = self._get_model()
+        output = model.encode(
+            [query],
+            max_length=MAX_LENGTH,
+            return_dense=True,
+            return_sparse=True,
+            return_colbert_vecs=False,
+        )
+        dense = output["dense_vecs"][0].tolist()
+        sparse_raw = output["lexical_weights"][0]
+        sparse = SparseVector(
+            indices=[int(k) for k in sparse_raw],
+            values=[float(sparse_raw[k]) for k in sparse_raw],
+        )
+        return dense, sparse
+
+    def search(
+        self,
+        query: str,
+        limit: int = 5,
+        filters: dict | None = None,
+    ) -> list[SearchResult]:
+        """Run hybrid search with RRF fusion.
+
+        Args:
+            query: natural language question
+            limit: number of results to return
+            filters: optional metadata filter e.g. {"ticker": "AAPL", "year": 2024}
+
+        Returns:
+            list of SearchResult ordered by RRF score (best first)
+        """
+        dense_vec, sparse_vec = self._embed_query(query)
+        qdrant_filter = _build_filter(filters or {})
+
+        results = self._client.query_points(
+            collection_name=COLLECTION_NAME,
+            prefetch=[
+                Prefetch(
+                    query=dense_vec,
+                    using="dense",
+                    limit=PREFETCH_LIMIT,
+                    filter=qdrant_filter,
+                ),
+                Prefetch(
+                    query=sparse_vec,
+                    using="sparse",
+                    limit=PREFETCH_LIMIT,
+                    filter=qdrant_filter,
+                ),
+            ],
+            query=FusionQuery(fusion=Fusion.RRF),
+            limit=limit,
+            with_payload=True,
+        )
+
+        hits = []
+        for point in results.points:
+            p = point.payload or {}
+            hits.append(
+                SearchResult(
+                    chunk_id=str(point.id),
+                    score=point.score,
+                    ticker=p.get("ticker", ""),
+                    company=p.get("company", ""),
+                    filing_type=p.get("filing_type", ""),
+                    year=p.get("year", 0),
+                    quarter=p.get("quarter", ""),
+                    section=p.get("section", ""),
+                    text=p.get("text", ""),
+                    context_prefix=p.get("context_prefix", ""),
+                )
+            )
+        return hits
