@@ -47,6 +47,7 @@ htmlcov/
 *.pdf
 data/raw/
 data/processed/
+data/filings/
 
 # Models (LoRA-адаптеры могут быть большими)
 *.bin
