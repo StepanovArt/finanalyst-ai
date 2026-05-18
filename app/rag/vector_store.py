@@ -87,7 +87,6 @@ def collection_info(client: QdrantClient) -> dict:
     """Return collection stats as a dict."""
     info = client.get_collection(COLLECTION_NAME)
     return {
-        "status": info.status,
-        "points_count": info.points_count,
-        "vectors_count": info.vectors_count,
+        "status": str(info.status),
+        "points_count": info.points_count or 0,
     }
