@@ -32,6 +32,8 @@ class FilingDocument:
     accession: str
     period: str  # e.g. "20240928"
     text: str
+    company: str = ""       # "Apple Inc."
+    currency: str = "USD"
     tables: list[FilingTable] = field(default_factory=list)
 
     @property
@@ -119,6 +121,22 @@ def _parse_period(raw: str) -> str:
     return match.group(1) if match else "unknown"
 
 
+def _parse_company(raw: str) -> str:
+    """Extract company name from SGML header."""
+    match = re.search(r"COMPANY CONFORMED NAME:\s*(.+)", raw)
+    return match.group(1).strip() if match else ""
+
+
+def _detect_currency(text: str) -> str:
+    """Detect reporting currency from filing text (default USD)."""
+    sample = text[:3000]
+    if re.search(r"\beuro\b|\beur\b|€", sample, re.I):
+        return "EUR"
+    if re.search(r"\bgbp\b|\bsterling\b|£", sample, re.I):
+        return "GBP"
+    return "USD"
+
+
 def parse_filing(path: Path) -> FilingDocument:
     """Parse a full-submission.txt file into a FilingDocument.
 
@@ -136,16 +154,20 @@ def parse_filing(path: Path) -> FilingDocument:
 
     raw = path.read_text(encoding="utf-8", errors="replace")
     period = _parse_period(raw)
+    company = _parse_company(raw)
 
     html_content = _extract_main_document(raw, filing_type)
     soup = BeautifulSoup(html_content, "lxml")
+    text = _extract_text(soup)
 
     return FilingDocument(
         ticker=ticker,
         filing_type=filing_type,
         accession=accession,
         period=period,
-        text=_extract_text(soup),
+        company=company,
+        currency=_detect_currency(text),
+        text=text,
         tables=_parse_tables(soup),
     )
 
