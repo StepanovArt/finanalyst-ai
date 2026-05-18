@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.2.1 — Embeddings: BAAI/bge-m3
+**Current Task:** 2.2.2 — Qdrant: Docker setup, collection schema
 
 ---
 
@@ -133,7 +133,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 2.1.5 — Contextual Retrieval: LLM-generated context prefix for each chunk
 
 #### 2.2 Basic Retrieval
-- [ ] 2.2.1 — Embeddings: BAAI/bge-m3 via sentence-transformers
+- [x] 2.2.1 — Embeddings: BAAI/bge-m3 via FlagEmbedding (dense 1024d + sparse)
 - [ ] 2.2.2 — Qdrant: Docker setup, collection schema with metadata filters
 - [ ] 2.2.3 — Hybrid Search: dense + sparse via Reciprocal Rank Fusion
 - [ ] 2.2.4 — Reranker: BAAI/bge-reranker-v2-m3
