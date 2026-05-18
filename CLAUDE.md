@@ -96,11 +96,14 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 ## 📍 Current Stage
 
-**Stage 1: FastAPI Service with LLM**
+**Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** Stage 1 Complete ✅
+**Current Task:** 2.1.1 — Download SEC EDGAR filings
 
-**Completed:**
+---
+
+### Stage 1: FastAPI Service with LLM ✅ Complete
+
 - [x] 1.1 — Project initialization (git, GitHub, CLAUDE.md, README.md, .gitignore)
 - [x] 1.2 — Basic FastAPI skeleton with /health endpoint
 - [x] 1.3 — LLMProvider abstraction (Strategy pattern)
@@ -115,12 +118,54 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 1.12 — Structured logging with request_id
 - [x] 1.13 — Tests (18 tests, 73% coverage)
 - [x] 1.14 — Docker + docker-compose (uv.lock, .dockerignore, Redis volume)
-
 - [x] 1.15 — GitHub Actions CI (ruff + pytest --cov-fail-under=60)
 - [x] 1.16 — README documentation
 
-DO NOT TOUCH (Этап 2 и 3):
-- LangGraph, Qdrant, embeddings, fine-tuning
+---
+
+### Stage 2 — Agentic RAG
+
+#### 2.1 Data Collection & Preparation
+- [ ] 2.1.1 — Download 20-30 SEC EDGAR filings (10-Q, 10-K) for 5-7 companies
+- [ ] 2.1.2 — PDF parsing: PyMuPDF for text, pdfplumber for tables
+- [ ] 2.1.3 — Structured chunking by report sections (Income Statement, Balance Sheet, MD&A)
+- [ ] 2.1.4 — Doc-level metadata (company, ticker, year, quarter, report type, currency)
+- [ ] 2.1.5 — Contextual Retrieval: LLM-generated context prefix for each chunk
+
+#### 2.2 Basic Retrieval
+- [ ] 2.2.1 — Embeddings: BAAI/bge-m3 via sentence-transformers
+- [ ] 2.2.2 — Qdrant: Docker setup, collection schema with metadata filters
+- [ ] 2.2.3 — Hybrid Search: dense + sparse via Reciprocal Rank Fusion
+- [ ] 2.2.4 — Reranker: BAAI/bge-reranker-v2-m3
+- [ ] 2.2.5 — POST /documents/upload endpoint with background processing
+
+#### 2.3 Agentic Layer
+- [ ] 2.3.1 — Domain Glossary: JSON with financial terms and synonyms (EBITDA, OPEX, FCF etc.)
+- [ ] 2.3.2 — Query Decomposition Agent: splits complex queries into sub-queries
+- [ ] 2.3.3 — Query Rewriting Agent: rephrases with glossary synonyms
+- [ ] 2.3.4 — Relevance Grader Agent: LLM validates each chunk (relevant/irrelevant/ambiguous)
+- [ ] 2.3.5 — Self-Correction Loop: rephrase + retry if low relevance (max 3 iterations)
+- [ ] 2.3.6 — Answer Synthesis Agent: generates answer with page citations
+- [ ] 2.3.7 — Hallucination Check: validates answer against context (Self-RAG)
+- [ ] 2.3.8 — LangGraph orchestration: assembles all agents into state-machine
+
+#### 2.4 Observability & API
+- [ ] 2.4.1 — Langfuse: self-hosted in docker-compose, tracing integration
+- [ ] 2.4.2 — POST /agent/query endpoint with trace_id in response
+- [ ] 2.4.3 — GET /agent/trace/{id} endpoint
+
+#### 2.5 Evaluation
+- [ ] 2.5.1 — Eval dataset: 50 QA pairs with ground truth answers and sources
+- [ ] 2.5.2 — Retrieval metrics: Recall@k, MRR
+- [ ] 2.5.3 — Generation metrics via RAGAS: Faithfulness, Answer Relevancy, Context Precision/Recall
+- [ ] 2.5.4 — Agentic metrics: % rewrites, avg iterations, latency, cost per query
+- [ ] 2.5.5 — Comparison table: naive RAG → hybrid+rerank → +contextual → full agentic
+
+---
+
+### Stage 3 — LoRA Fine-tuning
+Будет выполнен отдельно на Kaggle как standalone notebook.
+Результат интегрируется через LocalLoRAProvider после завершения.
 
 ---
 
