@@ -17,11 +17,16 @@ scores live on different scales — a weight that works for one query breaks
 for another. RRF only uses rank positions, which are stable across queries.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from functools import lru_cache
+from typing import TYPE_CHECKING
 
-from FlagEmbedding import BGEM3FlagModel, FlagReranker
 from qdrant_client import QdrantClient
+
+if TYPE_CHECKING:
+    from FlagEmbedding import BGEM3FlagModel, FlagReranker
 from qdrant_client.models import (
     FieldCondition,
     Filter,
@@ -41,7 +46,9 @@ MAX_LENGTH = 512
 
 @lru_cache(maxsize=1)
 def _get_reranker() -> FlagReranker:
-    return FlagReranker("BAAI/bge-reranker-v2-m3", use_fp16=True)
+    from FlagEmbedding import FlagReranker as _FlagReranker
+
+    return _FlagReranker("BAAI/bge-reranker-v2-m3", use_fp16=True)
 
 
 @dataclass
@@ -74,15 +81,17 @@ class HybridRetriever:
     def __init__(
         self,
         qdrant_url: str = QDRANT_URL,
-        model: BGEM3FlagModel | None = None,
+        model: BGEM3FlagModel | None = None,  # type: ignore[name-defined]
     ) -> None:
         self._client = QdrantClient(url=qdrant_url)
         # Accept an injected model (avoids reloading in scripts that already have it)
         self._model = model
 
-    def _get_model(self) -> BGEM3FlagModel:
+    def _get_model(self) -> BGEM3FlagModel:  # type: ignore[name-defined]
         if self._model is None:
-            self._model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
+            from FlagEmbedding import BGEM3FlagModel as _BGEM3FlagModel
+
+            self._model = _BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
         return self._model
 
     def _embed_query(self, query: str) -> tuple[list[float], SparseVector]:
