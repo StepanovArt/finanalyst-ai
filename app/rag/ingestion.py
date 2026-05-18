@@ -32,7 +32,7 @@ class FilingDocument:
     accession: str
     period: str  # e.g. "20240928"
     text: str
-    company: str = ""       # "Apple Inc."
+    company: str = ""  # "Apple Inc."
     currency: str = "USD"
     tables: list[FilingTable] = field(default_factory=list)
 

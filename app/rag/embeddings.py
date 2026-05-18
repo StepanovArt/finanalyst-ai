@@ -87,9 +87,7 @@ def embed_chunks(
         dense_vecs = output["dense_vecs"]
         sparse_vecs = output["lexical_weights"]
 
-        for i, (chunk_id, dense, sparse) in enumerate(
-            zip(batch_ids, dense_vecs, sparse_vecs)
-        ):
+        for i, (chunk_id, dense, sparse) in enumerate(zip(batch_ids, dense_vecs, sparse_vecs)):
             # sparse is {token_id_str: weight} — convert to parallel lists
             indices = [int(k) for k in sparse]
             values = [float(sparse[k]) for k in sparse]

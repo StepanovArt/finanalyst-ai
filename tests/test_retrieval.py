@@ -10,7 +10,6 @@ import pytest
 
 from app.rag.retrieval import HybridRetriever, SearchResult, _build_filter
 
-
 # ---------------------------------------------------------------------------
 # _build_filter
 # ---------------------------------------------------------------------------

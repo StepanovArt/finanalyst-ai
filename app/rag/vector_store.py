@@ -21,7 +21,6 @@ from qdrant_client.models import (
     SparseIndexParams,
     SparseVectorParams,
     VectorParams,
-    VectorsConfig,
 )
 
 COLLECTION_NAME = "sec_filings"

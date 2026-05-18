@@ -39,8 +39,8 @@ from qdrant_client.models import (
 
 from app.rag.vector_store import COLLECTION_NAME, QDRANT_URL
 
-PREFETCH_LIMIT = 20   # candidates per vector type before RRF
-RERANK_POOL = 20      # RRF candidates to pass to cross-encoder when reranking
+PREFETCH_LIMIT = 20  # candidates per vector type before RRF
+RERANK_POOL = 20  # RRF candidates to pass to cross-encoder when reranking
 MAX_LENGTH = 512
 
 
@@ -69,9 +69,7 @@ def _build_filter(filters: dict) -> Filter | None:
     """Build Qdrant filter from a plain dict of {field: value}."""
     if not filters:
         return None
-    conditions = [
-        FieldCondition(key=k, match=MatchValue(value=v)) for k, v in filters.items()
-    ]
+    conditions = [FieldCondition(key=k, match=MatchValue(value=v)) for k, v in filters.items()]
     return Filter(must=conditions)
 
 

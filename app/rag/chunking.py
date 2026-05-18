@@ -22,11 +22,23 @@ OVERLAP_WORDS = 100
 _SECTION_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     # Financial statement headers (appear inside Item 8 / Item 1 Part II)
     (re.compile(r"consolidated\s+statements?\s+of\s+operations", re.I), "Income Statement"),
-    (re.compile(r"consolidated\s+statements?\s+of\s+(comprehensive\s+)?income", re.I), "Income Statement"),
+    (
+        re.compile(r"consolidated\s+statements?\s+of\s+(comprehensive\s+)?income", re.I),
+        "Income Statement",
+    ),
     (re.compile(r"consolidated\s+balance\s+sheets?", re.I), "Balance Sheet"),
-    (re.compile(r"consolidated\s+statements?\s+of\s+cash\s+flows?", re.I), "Cash Flow Statement"),
-    (re.compile(r"consolidated\s+statements?\s+of\s+(stockholders|shareholders)", re.I), "Equity Statement"),
-    (re.compile(r"notes?\s+to\s+(the\s+)?consolidated\s+financial\s+statements?", re.I), "Notes to FS"),
+    (
+        re.compile(r"consolidated\s+statements?\s+of\s+cash\s+flows?", re.I),
+        "Cash Flow Statement",
+    ),
+    (
+        re.compile(r"consolidated\s+statements?\s+of\s+(stockholders|shareholders)", re.I),
+        "Equity Statement",
+    ),
+    (
+        re.compile(r"notes?\s+to\s+(the\s+)?consolidated\s+financial\s+statements?", re.I),
+        "Notes to FS",
+    ),
     # 10-K ITEM headers
     (re.compile(r"item\s+1a[\.\s]+risk\s+factors?", re.I), "Risk Factors"),
     (re.compile(r"item\s+1[\.\s]+business", re.I), "Business Overview"),
