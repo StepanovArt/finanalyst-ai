@@ -46,9 +46,6 @@ This project is being built as a **portfolio piece for AI Engineer job interview
 ### LLM & ML
 - **OpenAI API** (gpt-4o, gpt-4o-mini) — primary LLM provider during development
 - **Ollama** — local inference alternative
-- **Qwen2.5-3B-Instruct** — base model for fine-tuning (Stage 3)
-- **Unsloth** — efficient LoRA fine-tuning
-- **PEFT, TRL, transformers** — HuggingFace ecosystem
 - **sentence-transformers (BAAI/bge-m3)** — multilingual embeddings (works well with Russian/English)
 - **BAAI/bge-reranker-v2-m3** — reranker model
 
@@ -64,7 +61,6 @@ This project is being built as a **portfolio piece for AI Engineer job interview
 
 ### Evaluation
 - **RAGAS** — RAG quality metrics
-- **Weights & Biases** — fine-tuning experiment tracking
 
 ### Quality & Infrastructure
 - **uv** — Python package management (FAST — preferred over pip/poetry)
@@ -89,16 +85,13 @@ Production-ready backend with LLM integration, specialized for financial domain.
 ### Stage 2: Agentic RAG with Self-Correction (14-18 days)
 State-of-the-art agentic RAG system implementing Self-RAG and Corrective RAG patterns. Includes domain terminology handling, self-correction loops, and rigorous evaluation.
 
-### Stage 3: LoRA Fine-tuning (10-14 days)
-Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the fine-tuned model into the agentic RAG as the Answer Synthesis Agent.
-
 ---
 
 ## 📍 Current Stage
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.4.1 — Langfuse observability
+**Status:** Stage 2 complete ✅
 
 ---
 
@@ -163,12 +156,6 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 ---
 
-### Stage 3 — LoRA Fine-tuning
-Будет выполнен отдельно на Kaggle как standalone notebook.
-Результат интегрируется через LocalLoRAProvider после завершения.
-
----
-
 ## 📁 Target Project Structure
 finanalyst-ai/
 ├── app/
@@ -212,8 +199,6 @@ finanalyst-ai/
 │   ├── init.py
 │   ├── conftest.py
 │   └── test_*.py
-├── notebooks/               # Stage 3: Fine-tuning notebooks
-│   └── finetune_qwen_lora.ipynb
 ├── eval/                    # Evaluation datasets and scripts
 │   ├── dataset.jsonl
 │   └── run_eval.py
@@ -291,7 +276,7 @@ Document these so I can defend them in interviews:
 - Modern, performant, industry standard for AI services in 2025-2026
 
 ### Why Strategy Pattern for LLM Providers?
-- Allows swapping OpenAI ↔ Anthropic ↔ Ollama ↔ Fine-tuned Qwen via a single env var
+- Allows swapping OpenAI ↔ Anthropic ↔ Ollama via a single env var
 - Enables A/B testing of different models in production
 - Decouples business logic from provider-specific SDKs
 
@@ -318,12 +303,6 @@ Document these so I can defend them in interviews:
 - Generates dense + sparse embeddings simultaneously — enables hybrid search without separate BM25 index
 - Free, runs locally, no API costs at retrieval scale
 - Top-tier benchmark performance
-
-### Why LoRA + QLoRA (not full fine-tuning)?
-- 1000× fewer trainable parameters → fits on consumer GPUs (T4, A100)
-- 4-bit base model quantization saves memory
-- Multiple LoRA adapters can be hot-swapped for different tasks
-- Standard approach for resource-efficient adaptation in 2025-2026
 
 ---
 
@@ -360,7 +339,6 @@ class LLMProvider(ABC):
 
 class OpenAIProvider(LLMProvider): ...
 class OllamaProvider(LLMProvider): ...
-class LocalLoRAProvider(LLMProvider): ...  # Stage 3
 ```
 
 ### Settings via pydantic-settings
@@ -397,7 +375,6 @@ async def chat(
 - Anthropic Contextual Retrieval: https://www.anthropic.com/news/contextual-retrieval
 - LangGraph docs: https://langchain-ai.github.io/langgraph/
 - Qdrant docs: https://qdrant.tech/documentation/
-- Unsloth docs: https://github.com/unslothai/unsloth
 - RAGAS docs: https://docs.ragas.io/
 
 ---
