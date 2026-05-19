@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.3.7 — Hallucination Check
+**Current Task:** 2.3.8 — LangGraph orchestration
 
 ---
 
@@ -146,7 +146,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 2.3.4 — Relevance Grader Agent: LLM validates each chunk (relevant/irrelevant/ambiguous)
 - [x] 2.3.5 — Self-Correction Loop: rephrase + retry if low relevance (max 3 iterations)
 - [x] 2.3.6 — Answer Synthesis Agent: generates answer with page citations
-- [ ] 2.3.7 — Hallucination Check: validates answer against context (Self-RAG)
+- [x] 2.3.7 — Hallucination Check: validates answer against context (Self-RAG)
 - [ ] 2.3.8 — LangGraph orchestration: assembles all agents into state-machine
 
 #### 2.4 Observability & API
