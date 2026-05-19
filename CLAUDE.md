@@ -385,3 +385,4 @@ async def chat(
 > Format: `YYYY-MM-DD: [Stage X.Y] What was done`
 
 - 2026-05-14: [Stage 1.1] Project initialization — git, GitHub repo, CLAUDE.md, README.md, .gitignore. First commit pushed to origin/main.
+- 2026-05-19: [Stage 2 complete] All agentic RAG tasks done (2.1–2.5): data ingestion, hybrid retrieval, reranker, LangGraph pipeline (decompose→retrieve→synthesize→check), Langfuse tracing, /agent/query + /agent/trace endpoints, evaluation framework. Real eval: Recall@5=0.800, MRR=0.656 on 2,092 indexed chunks. README rewritten as portfolio showcase.

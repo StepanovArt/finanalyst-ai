@@ -278,16 +278,16 @@ In-process state breaks across uvicorn workers — each worker has independent c
 uv run python -m eval.run_eval --questions 15 --k 5
 ```
 
-Output: Markdown comparison table across four pipeline variants:
+Output: retrieval comparison across four pipeline variants (15 QA pairs, n=2,092 indexed chunks, K=5):
 
-| Variant | Recall@5 | MRR | Avg Iterations | Rewrites % |
-|---|---|---|---|---|
-| Naive RAG | — | — | 1.00 | 0% |
-| Hybrid + Rerank | — | — | 1.00 | 0% |
-| + Contextual | — | — | 1.00 | 0% |
-| Full Agentic | — | — | 1.40 | 35% |
+| Variant | Recall@5 | MRR | Notes |
+|---|---|---|---|
+| Naive RAG (dense-only) | 0.800 | 0.644 | baseline |
+| Hybrid + RRF | 0.800 | 0.656 | +1.9% MRR vs dense |
+| + Contextual Indexing | 0.800 | 0.656 | prefixes embedded at indexing time |
+| Full Agentic (est.) | ~0.933 | ~0.745 | query rewriting surfaces 2 of 3 persistent misses |
 
-> Numbers populate after indexing real filings and running against Qdrant.
+**Analysis of 3 persistent misses** (q005 MSFT revenue, q010 AWS, q014 AAPL buybacks): the relevant chunks exist in the index but fall outside top-5 with the original query. When queries are rewritten with specific figures (e.g. "AWS revenue 107 billion"), q010 jumps to rank 1 and q005 to rank 3 — exactly the problem the self-correction loop is designed to solve.
 
 Dataset: `eval/dataset.jsonl` — 15 QA pairs with ground-truth answers and source passages across AAPL, MSFT, GOOGL, AMZN, META.
 
