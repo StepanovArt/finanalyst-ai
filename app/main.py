@@ -15,6 +15,7 @@ from app.core.limiter import limiter
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware
 from app.routers import chat, health
+from app.routers.agent import router as agent_router
 from app.routers.documents import router as documents_router
 
 setup_logging()
@@ -27,6 +28,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.include_router(health.router)
 app.include_router(chat.router)
 app.include_router(documents_router)
+app.include_router(agent_router)
 
 
 @app.exception_handler(LLMRateLimitError)
