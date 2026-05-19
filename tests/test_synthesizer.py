@@ -31,10 +31,12 @@ def _chunk(chunk_id: str, text: str = "Revenue was $100B in FY2024.") -> SearchR
 
 
 def _ok_response(answer: str, chunk_id: str = "1", quote: str = "Revenue was $100B") -> str:
-    return json.dumps({
-        "answer": answer,
-        "citations": [{"chunk_id": chunk_id, "quote": quote}],
-    })
+    return json.dumps(
+        {
+            "answer": answer,
+            "citations": [{"chunk_id": chunk_id, "quote": quote}],
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -44,6 +46,7 @@ def _ok_response(answer: str, chunk_id: str = "1", quote: str = "Revenue was $10
 
 def test_synthesis_result_has_citations_true() -> None:
     from app.agents.synthesizer import Citation
+
     c = Citation("1", "quote", "Apple Inc.", "10-K", 2024, "FY", "MD&A")
     result = SynthesisResult(answer="answer", citations=[c])
     assert result.has_citations is True
@@ -76,13 +79,15 @@ async def test_synthesize_returns_answer_and_citation() -> None:
 @pytest.mark.asyncio
 async def test_synthesize_skips_unknown_chunk_id_in_citations() -> None:
     chunks = [_chunk("1")]
-    response = json.dumps({
-        "answer": "Some answer.",
-        "citations": [
-            {"chunk_id": "1", "quote": "valid"},
-            {"chunk_id": "999", "quote": "unknown chunk"},
-        ],
-    })
+    response = json.dumps(
+        {
+            "answer": "Some answer.",
+            "citations": [
+                {"chunk_id": "1", "quote": "valid"},
+                {"chunk_id": "999", "quote": "unknown chunk"},
+            ],
+        }
+    )
     result = await _synthesizer(response).synthesize("query", chunks)
 
     assert len(result.citations) == 1
@@ -101,10 +106,12 @@ async def test_synthesize_no_citations_in_response() -> None:
 @pytest.mark.asyncio
 async def test_synthesize_truncates_long_quotes() -> None:
     long_quote = "x" * 400
-    response = json.dumps({
-        "answer": "answer",
-        "citations": [{"chunk_id": "1", "quote": long_quote}],
-    })
+    response = json.dumps(
+        {
+            "answer": "answer",
+            "citations": [{"chunk_id": "1", "quote": long_quote}],
+        }
+    )
     result = await _synthesizer(response).synthesize("query", [_chunk("1")])
 
     assert len(result.citations[0].quote) <= 300

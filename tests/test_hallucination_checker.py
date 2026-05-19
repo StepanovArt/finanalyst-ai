@@ -21,8 +21,14 @@ def _checker(response: str) -> HallucinationChecker:
 
 def _chunk(chunk_id: str = "1") -> SearchResult:
     return SearchResult(
-        chunk_id=chunk_id, score=0.9, ticker="AAPL", company="Apple Inc.",
-        filing_type="10-K", year=2024, quarter="FY", section="MD&A",
+        chunk_id=chunk_id,
+        score=0.9,
+        ticker="AAPL",
+        company="Apple Inc.",
+        filing_type="10-K",
+        year=2024,
+        quarter="FY",
+        section="MD&A",
         text="Net sales were $391 billion for fiscal year 2024.",
         context_prefix="prefix",
     )
@@ -104,9 +110,7 @@ async def test_check_falls_back_on_invalid_json() -> None:
 
 @pytest.mark.asyncio
 async def test_check_falls_back_on_unknown_label() -> None:
-    result = await _checker('{"label": "unknown", "reason": "?"}').check(
-        "some answer", [_chunk()]
-    )
+    result = await _checker('{"label": "unknown", "reason": "?"}').check("some answer", [_chunk()])
     assert result.label == GroundednessLabel.PARTIALLY_GROUNDED
 
 

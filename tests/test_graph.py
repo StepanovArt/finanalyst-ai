@@ -19,9 +19,16 @@ from app.rag.retrieval import SearchResult
 
 def _chunk(chunk_id: str) -> SearchResult:
     return SearchResult(
-        chunk_id=chunk_id, score=0.9, ticker="AAPL", company="Apple Inc.",
-        filing_type="10-K", year=2024, quarter="FY", section="MD&A",
-        text="revenue text", context_prefix="prefix",
+        chunk_id=chunk_id,
+        score=0.9,
+        ticker="AAPL",
+        company="Apple Inc.",
+        filing_type="10-K",
+        year=2024,
+        quarter="FY",
+        section="MD&A",
+        text="revenue text",
+        context_prefix="prefix",
     )
 
 
@@ -37,9 +44,7 @@ def _make_graph(
     citations = citations or []
 
     decomposer = MagicMock()
-    decomposer.decompose = AsyncMock(
-        return_value=DecompositionResult(sub_queries=sub_queries)
-    )
+    decomposer.decompose = AsyncMock(return_value=DecompositionResult(sub_queries=sub_queries))
 
     loop = MagicMock()
     loop.run = AsyncMock(
@@ -117,9 +122,7 @@ async def test_graph_deduplicates_chunks_across_sub_queries() -> None:
     shared_chunk = _chunk("shared")
 
     decomposer = MagicMock()
-    decomposer.decompose = AsyncMock(
-        return_value=DecompositionResult(sub_queries=["q1", "q2"])
-    )
+    decomposer.decompose = AsyncMock(return_value=DecompositionResult(sub_queries=["q1", "q2"]))
     loop = MagicMock()
     loop.run = AsyncMock(
         return_value=SelfCorrectionResult(final_chunks=[shared_chunk], final_query="q")

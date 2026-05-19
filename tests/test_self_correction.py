@@ -16,22 +16,29 @@ from app.rag.retrieval import SearchResult
 
 def _chunk(chunk_id: str) -> SearchResult:
     return SearchResult(
-        chunk_id=chunk_id, score=0.9, ticker="AAPL", company="Apple Inc.",
-        filing_type="10-K", year=2024, quarter="FY", section="MD&A",
-        text="revenue text", context_prefix="prefix",
+        chunk_id=chunk_id,
+        score=0.9,
+        ticker="AAPL",
+        company="Apple Inc.",
+        filing_type="10-K",
+        year=2024,
+        quarter="FY",
+        section="MD&A",
+        text="revenue text",
+        context_prefix="prefix",
     )
 
 
 def _sufficient_grading(chunk_ids: list[str]) -> GradingResult:
-    return GradingResult(grades=[
-        ChunkGrade(cid, GradeLabel.RELEVANT, "relevant") for cid in chunk_ids
-    ])
+    return GradingResult(
+        grades=[ChunkGrade(cid, GradeLabel.RELEVANT, "relevant") for cid in chunk_ids]
+    )
 
 
 def _insufficient_grading(chunk_ids: list[str]) -> GradingResult:
-    return GradingResult(grades=[
-        ChunkGrade(cid, GradeLabel.IRRELEVANT, "not relevant") for cid in chunk_ids
-    ])
+    return GradingResult(
+        grades=[ChunkGrade(cid, GradeLabel.IRRELEVANT, "not relevant") for cid in chunk_ids]
+    )
 
 
 def _make_loop(
@@ -47,11 +54,13 @@ def _make_loop(
     grader.grade = AsyncMock(side_effect=gradings)
 
     rewriter = MagicMock()
-    rewriter.rewrite = AsyncMock(return_value=RewriteResult(
-        original_query="original",
-        rewritten_query=rewrite_response,
-        synonyms_added=[],
-    ))
+    rewriter.rewrite = AsyncMock(
+        return_value=RewriteResult(
+            original_query="original",
+            rewritten_query=rewrite_response,
+            synonyms_added=[],
+        )
+    )
 
     return SelfCorrectionLoop(
         retriever=retriever,
@@ -140,11 +149,9 @@ def test_result_succeeded_false_when_no_iterations() -> None:
 
 def test_result_total_attempts_matches_iterations_length() -> None:
     from app.agents.self_correction import IterationResult
+
     grading = _insufficient_grading([])
-    iters = [
-        IterationResult(attempt=i, query="q", chunks=[], grading=grading)
-        for i in range(1, 3)
-    ]
+    iters = [IterationResult(attempt=i, query="q", chunks=[], grading=grading) for i in range(1, 3)]
     result = SelfCorrectionResult(final_chunks=[], final_query="q", iterations=iters)
     assert result.total_attempts == 2
     assert result.rewrites_triggered == 1
