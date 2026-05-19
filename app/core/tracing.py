@@ -17,6 +17,24 @@ from loguru import logger
 from app.core.config import settings
 
 
+def get_langfuse_client() -> object | None:
+    """Return a Langfuse client for trace fetching, or None if not configured."""
+    if not (settings.langfuse_public_key and settings.langfuse_secret_key):
+        return None
+
+    try:
+        from langfuse import Langfuse  # type: ignore[import-untyped]
+
+        return Langfuse(
+            public_key=settings.langfuse_public_key,
+            secret_key=settings.langfuse_secret_key,
+            host=settings.langfuse_host,
+        )
+    except Exception as exc:
+        logger.warning(f"Langfuse client initialisation failed: {exc}")
+        return None
+
+
 def get_langfuse_handler(
     session_id: str | None = None,
     user_id: str | None = None,
