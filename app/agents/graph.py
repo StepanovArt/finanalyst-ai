@@ -15,10 +15,11 @@ Why LangGraph over a plain async function?
 - Each node is independently testable and replaceable
 - LangGraph handles async node execution natively
 - Cycles are trivial to add later (e.g. re-synthesize on hallucination)
-- Integrates with LangSmith / Langfuse for tracing (2.4.1)
+- Integrates with LangSmith / Langfuse for tracing via CallbackHandler
 """
 
-from dataclasses import dataclass
+import uuid
+from dataclasses import dataclass, field
 from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
@@ -28,6 +29,7 @@ from app.agents.decomposer import QueryDecomposer
 from app.agents.hallucination_checker import GroundednessLabel, HallucinationChecker
 from app.agents.self_correction import SelfCorrectionLoop
 from app.agents.synthesizer import AnswerSynthesizer, Citation
+from app.core.tracing import get_langfuse_handler
 from app.rag.retrieval import SearchResult
 
 
@@ -54,6 +56,7 @@ class AgentResponse:
     sub_queries: list[str]
     is_hallucinated: bool
     groundedness: str
+    trace_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
 class RAGAgentGraph:
@@ -129,16 +132,22 @@ class RAGAgentGraph:
         self,
         query: str,
         filters: dict | None = None,
+        session_id: str | None = None,
+        user_id: str | None = None,
     ) -> AgentResponse:
         """Execute the full RAG pipeline for a user query.
 
         Args:
             query: the user question
             filters: optional Qdrant metadata filters (e.g. {"ticker": "AAPL"})
+            session_id: forwarded to Langfuse for session grouping
+            user_id: forwarded to Langfuse for per-user analytics
 
         Returns:
-            AgentResponse with answer, citations and quality metadata
+            AgentResponse with answer, citations, quality metadata, and trace_id
         """
+        trace_id = str(uuid.uuid4())
+
         initial: AgentState = {
             "query": query,
             "filters": filters,
@@ -150,7 +159,12 @@ class RAGAgentGraph:
             "is_hallucinated": False,
         }
 
-        final: AgentState = await self._graph.ainvoke(initial)
+        config: dict = {}
+        handler = get_langfuse_handler(session_id=session_id, user_id=user_id)
+        if handler is not None:
+            config["callbacks"] = [handler]
+
+        final: AgentState = await self._graph.ainvoke(initial, config=config or None)
 
         return AgentResponse(
             query=query,
@@ -159,4 +173,5 @@ class RAGAgentGraph:
             sub_queries=final["sub_queries"],
             is_hallucinated=final["is_hallucinated"],
             groundedness=final["groundedness"],
+            trace_id=trace_id,
         )

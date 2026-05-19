@@ -24,5 +24,9 @@ class Settings(BaseSettings):
     rate_limit_chat: str = "20/minute"
     rate_limit_stream: str = "10/minute"
 
+    langfuse_public_key: str = ""
+    langfuse_secret_key: str = ""
+    langfuse_host: str = "http://localhost:3000"
+
 
 settings = Settings()
