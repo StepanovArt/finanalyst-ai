@@ -1,0 +1,341 @@
+{
+  "terms": [
+    {
+      "term": "EBITDA",
+      "full_name": "Earnings Before Interest, Taxes, Depreciation, and Amortization",
+      "category": "profitability",
+      "synonyms": [
+        "earnings before interest taxes depreciation and amortization",
+        "operating earnings",
+        "adjusted operating profit"
+      ]
+    },
+    {
+      "term": "EBIT",
+      "full_name": "Earnings Before Interest and Taxes",
+      "category": "profitability",
+      "synonyms": [
+        "operating income",
+        "operating profit",
+        "earnings before interest and taxes",
+        "income from operations"
+      ]
+    },
+    {
+      "term": "EPS",
+      "full_name": "Earnings Per Share",
+      "category": "profitability",
+      "synonyms": [
+        "earnings per share",
+        "net income per share",
+        "diluted EPS",
+        "basic EPS"
+      ]
+    },
+    {
+      "term": "Net Income",
+      "full_name": "Net Income",
+      "category": "profitability",
+      "synonyms": [
+        "net profit",
+        "net earnings",
+        "bottom line",
+        "profit after tax",
+        "net loss"
+      ]
+    },
+    {
+      "term": "Gross Profit",
+      "full_name": "Gross Profit",
+      "category": "profitability",
+      "synonyms": [
+        "gross income",
+        "gross earnings",
+        "revenue minus cost of goods sold"
+      ]
+    },
+    {
+      "term": "Revenue",
+      "full_name": "Total Revenue",
+      "category": "revenue",
+      "synonyms": [
+        "total revenue",
+        "net revenue",
+        "net sales",
+        "sales",
+        "top line",
+        "turnover",
+        "total net revenue"
+      ]
+    },
+    {
+      "term": "Gross Margin",
+      "full_name": "Gross Profit Margin",
+      "category": "margins",
+      "synonyms": [
+        "gross profit margin",
+        "gross margin percentage",
+        "gross profit rate"
+      ]
+    },
+    {
+      "term": "Operating Margin",
+      "full_name": "Operating Profit Margin",
+      "category": "margins",
+      "synonyms": [
+        "operating profit margin",
+        "EBIT margin",
+        "operating income margin"
+      ]
+    },
+    {
+      "term": "Net Margin",
+      "full_name": "Net Profit Margin",
+      "category": "margins",
+      "synonyms": [
+        "net profit margin",
+        "profit margin",
+        "return on sales",
+        "net income margin"
+      ]
+    },
+    {
+      "term": "FCF",
+      "full_name": "Free Cash Flow",
+      "category": "cash_flow",
+      "synonyms": [
+        "free cash flow",
+        "levered free cash flow",
+        "unlevered free cash flow",
+        "cash flow after capex"
+      ]
+    },
+    {
+      "term": "Operating Cash Flow",
+      "full_name": "Cash Flow from Operations",
+      "category": "cash_flow",
+      "synonyms": [
+        "cash flow from operations",
+        "cash from operations",
+        "CFO",
+        "operating activities cash flow",
+        "net cash provided by operating activities"
+      ]
+    },
+    {
+      "term": "CapEx",
+      "full_name": "Capital Expenditures",
+      "category": "cash_flow",
+      "synonyms": [
+        "capital expenditures",
+        "capital spending",
+        "purchases of property plant and equipment",
+        "PP&E purchases",
+        "investment in fixed assets"
+      ]
+    },
+    {
+      "term": "COGS",
+      "full_name": "Cost of Goods Sold",
+      "category": "expenses",
+      "synonyms": [
+        "cost of goods sold",
+        "cost of revenue",
+        "cost of sales",
+        "cost of products",
+        "direct costs"
+      ]
+    },
+    {
+      "term": "OPEX",
+      "full_name": "Operating Expenses",
+      "category": "expenses",
+      "synonyms": [
+        "operating expenses",
+        "operating costs",
+        "total operating expenses"
+      ]
+    },
+    {
+      "term": "SG&A",
+      "full_name": "Selling, General and Administrative Expenses",
+      "category": "expenses",
+      "synonyms": [
+        "selling general and administrative",
+        "selling general and administrative expenses",
+        "general and administrative expenses",
+        "G&A",
+        "overhead"
+      ]
+    },
+    {
+      "term": "R&D",
+      "full_name": "Research and Development Expenses",
+      "category": "expenses",
+      "synonyms": [
+        "research and development",
+        "research and development expenses",
+        "R&D expenses",
+        "research expenses"
+      ]
+    },
+    {
+      "term": "Total Assets",
+      "full_name": "Total Assets",
+      "category": "balance_sheet",
+      "synonyms": [
+        "assets",
+        "total assets",
+        "total balance sheet assets"
+      ]
+    },
+    {
+      "term": "Total Debt",
+      "full_name": "Total Debt",
+      "category": "balance_sheet",
+      "synonyms": [
+        "total debt",
+        "long-term debt",
+        "short-term debt",
+        "borrowings",
+        "total borrowings",
+        "notes payable"
+      ]
+    },
+    {
+      "term": "Net Debt",
+      "full_name": "Net Debt",
+      "category": "balance_sheet",
+      "synonyms": [
+        "net debt",
+        "debt minus cash",
+        "net financial debt",
+        "net borrowings"
+      ]
+    },
+    {
+      "term": "Equity",
+      "full_name": "Shareholders' Equity",
+      "category": "balance_sheet",
+      "synonyms": [
+        "shareholders equity",
+        "stockholders equity",
+        "total equity",
+        "book value",
+        "net assets",
+        "owners equity"
+      ]
+    },
+    {
+      "term": "Working Capital",
+      "full_name": "Working Capital",
+      "category": "balance_sheet",
+      "synonyms": [
+        "working capital",
+        "net working capital",
+        "current assets minus current liabilities"
+      ]
+    },
+    {
+      "term": "ROE",
+      "full_name": "Return on Equity",
+      "category": "efficiency",
+      "synonyms": [
+        "return on equity",
+        "return on shareholders equity"
+      ]
+    },
+    {
+      "term": "ROA",
+      "full_name": "Return on Assets",
+      "category": "efficiency",
+      "synonyms": [
+        "return on assets",
+        "return on total assets"
+      ]
+    },
+    {
+      "term": "ROIC",
+      "full_name": "Return on Invested Capital",
+      "category": "efficiency",
+      "synonyms": [
+        "return on invested capital",
+        "return on capital employed",
+        "ROCE"
+      ]
+    },
+    {
+      "term": "YoY",
+      "full_name": "Year-over-Year",
+      "category": "growth",
+      "synonyms": [
+        "year over year",
+        "year-on-year",
+        "annual growth",
+        "compared to prior year",
+        "compared to last year",
+        "versus prior year"
+      ]
+    },
+    {
+      "term": "QoQ",
+      "full_name": "Quarter-over-Quarter",
+      "category": "growth",
+      "synonyms": [
+        "quarter over quarter",
+        "quarter-on-quarter",
+        "sequential growth",
+        "compared to prior quarter"
+      ]
+    },
+    {
+      "term": "CAGR",
+      "full_name": "Compound Annual Growth Rate",
+      "category": "growth",
+      "synonyms": [
+        "compound annual growth rate",
+        "annualized growth rate",
+        "annual growth rate"
+      ]
+    },
+    {
+      "term": "Guidance",
+      "full_name": "Forward Guidance",
+      "category": "outlook",
+      "synonyms": [
+        "forward guidance",
+        "outlook",
+        "forecast",
+        "full year guidance",
+        "next quarter guidance",
+        "financial outlook",
+        "management guidance"
+      ]
+    },
+    {
+      "term": "Buyback",
+      "full_name": "Share Repurchase",
+      "category": "capital_allocation",
+      "synonyms": [
+        "share repurchase",
+        "stock repurchase",
+        "repurchase program",
+        "share buyback",
+        "stock buyback"
+      ]
+    },
+    {
+      "term": "Dividend",
+      "full_name": "Dividend",
+      "category": "capital_allocation",
+      "synonyms": [
+        "dividend",
+        "cash dividend",
+        "dividend per share",
+        "DPS",
+        "quarterly dividend",
+        "annual dividend"
+      ]
+    }
+  ]
+}

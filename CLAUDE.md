@@ -98,7 +98,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 
 **Stage 2: Agentic RAG with Self-Correction**
 
-**Current Task:** 2.3.1 — Domain Glossary: JSON with financial terms and synonyms
+**Current Task:** 2.3.2 — Query Decomposition Agent
 
 ---
 
@@ -140,7 +140,7 @@ Fine-tune Qwen2.5-3B on financial domain for structured outputs. Integrate the f
 - [x] 2.2.5 — POST /documents/upload endpoint with background processing
 
 #### 2.3 Agentic Layer
-- [ ] 2.3.1 — Domain Glossary: JSON with financial terms and synonyms (EBITDA, OPEX, FCF etc.)
+- [x] 2.3.1 — Domain Glossary: JSON with financial terms and synonyms (EBITDA, OPEX, FCF etc.)
 - [ ] 2.3.2 — Query Decomposition Agent: splits complex queries into sub-queries
 - [ ] 2.3.3 — Query Rewriting Agent: rephrases with glossary synonyms
 - [ ] 2.3.4 — Relevance Grader Agent: LLM validates each chunk (relevant/irrelevant/ambiguous)
