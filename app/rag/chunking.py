@@ -152,9 +152,25 @@ def _split_into_sections(text: str) -> list[tuple[str, str]]:
     return [(name, "\n".join(lines).strip()) for name, lines in sections]
 
 
-def _make_id(ticker: str, period: str, filing_type: str, section: str, index: int) -> str:
-    raw = f"{ticker}_{filing_type}_{period}_{section}_{index}"
-    short = hashlib.md5(raw.encode()).hexdigest()[:8]
+def _make_id(
+    ticker: str,
+    period: str,
+    filing_type: str,
+    accession: str,
+    section: str,
+    seq: int,
+) -> str:
+    """Build a globally-unique chunk id.
+
+    The hash includes the accession (distinguishes filings that share a
+    ticker+type+period, e.g. an amended re-filing) and a document-global running
+    sequence number `seq` (distinguishes chunks across section blocks that share
+    a canonical name — without it, every "Income Statement" or "Notes to FS"
+    block restarts at index 0 and collides). 12 hex chars make birthday
+    collisions across the corpus negligible.
+    """
+    raw = f"{ticker}_{filing_type}_{period}_{accession}_{section}_{seq}"
+    short = hashlib.md5(raw.encode()).hexdigest()[:12]
     return f"{ticker}_{period}_{short}"
 
 
@@ -182,6 +198,7 @@ def chunk_document(doc: FilingDocument) -> list[Chunk]:
     """Chunk a FilingDocument into retrieval-ready Chunks."""
     sections = _split_into_sections(doc.text)
     chunks: list[Chunk] = []
+    seq = 0  # document-global counter — guarantees unique ids across all sections
 
     for section_name, section_text in sections:
         if section_name not in _RELEVANT_SECTIONS:
@@ -191,7 +208,10 @@ def chunk_document(doc: FilingDocument) -> list[Chunk]:
 
         windows = _sliding_window(section_text)
         for idx, window_text in enumerate(windows):
-            chunk_id = _make_id(doc.ticker, doc.period, doc.filing_type, section_name, idx)
+            chunk_id = _make_id(
+                doc.ticker, doc.period, doc.filing_type, doc.accession, section_name, seq
+            )
+            seq += 1
             chunks.append(
                 Chunk(
                     id=chunk_id,

@@ -136,6 +136,38 @@ def test_chunk_document_10q_has_quarter() -> None:
     assert all(c.quarter.startswith("Q") for c in chunks)
 
 
+def test_chunk_document_ids_are_unique_across_repeated_sections() -> None:
+    """Regression: two blocks mapping to the same canonical section must not collide.
+
+    Previously _make_id keyed on (section, per-block index), so a second
+    "Income Statement" block restarted at index 0 and produced a duplicate id.
+    The document-global seq counter fixes this.
+    """
+    from app.rag.chunking import chunk_document
+    from app.rag.ingestion import FilingDocument
+
+    text = (
+        "CONSOLIDATED STATEMENTS OF OPERATIONS\n\n"
+        + "Total net sales were strong this period. " * 40
+        + "\n\nCONSOLIDATED STATEMENTS OF OPERATIONS\n\n"
+        + "Net income increased year over year. " * 40
+    )
+    doc = FilingDocument(
+        ticker="ACME",
+        filing_type="10-K",
+        accession="0001234-24-001",
+        period="20240930",
+        company="Acme Corp",
+        text=text,
+    )
+
+    chunks = chunk_document(doc)
+    ids = [c.id for c in chunks]
+
+    assert len(ids) >= 2  # both Income Statement blocks were chunked
+    assert len(ids) == len(set(ids)), "chunk ids must be unique"
+
+
 def test_chunk_to_dict_has_required_keys() -> None:
     from app.rag.chunking import chunk_document
 
