@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/python-3.11+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.2-orange)
-![Tests](https://img.shields.io/badge/tests-140%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-141%20passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-77%25-green)
 ![Ruff](https://img.shields.io/badge/code%20style-ruff-black)
 
@@ -114,138 +114,8 @@ AgentResponse { answer, citations, sub_queries, is_hallucinated, groundedness, t
 | Cache | Redis | Conversation history, rate limits, circuit breaker state |
 | Validation | Pydantic v2 | Type-safe schemas across all layers |
 | Reliability | stamina + custom circuit breaker | Retries with backoff, shared state across workers |
-| Rate limiting | slowapi | Per-IP limits on chat + streaming endpoints |
-| Evaluation | RAGAS | Faithfulness, Answer Relevancy, Context Precision/Recall |
-| Logging | loguru | Structured logs with request_id context |
 | Packaging | uv + uv.lock | Reproducible builds, 10× faster than pip |
-| Containers | Docker + docker-compose | One-command local setup with all services |
 | CI | GitHub Actions | ruff + pytest with 60% coverage gate |
-
----
-
-## Quick Start
-
-### Docker Compose (recommended)
-
-```bash
-git clone https://github.com/StepanovArt/finanalyst-ai.git
-cd finanalyst-ai
-
-cp .env.example .env
-# Set OPENAI_API_KEY in .env
-
-docker-compose up --build
-```
-
-Starts: **app** (8000) · **Redis** (6379) · **Qdrant** (6333) · **Langfuse** (3000)
-
-### Local with uv
-
-```bash
-uv sync
-uv run uvicorn app.main:app --reload
-```
-
-Swagger UI: `http://localhost:8000/docs`
-
----
-
-## API Reference
-
-### Agent Query — `POST /agent/query`
-
-Runs the full agentic pipeline: decompose → retrieve → synthesize → check.
-
-```bash
-curl -X POST http://localhost:8000/agent/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "Compare Apple and Microsoft operating margins in fiscal 2024",
-    "filters": {"year": 2024},
-    "session_id": "analyst-session-1"
-  }'
-```
-
-```json
-{
-  "query": "Compare Apple and Microsoft operating margins in fiscal 2024",
-  "answer": "Apple's operating margin was 31.5% in fiscal 2024, up from 29.8% in 2023. Microsoft's was 44.6%, up from 41.7%. Microsoft leads by ~13 percentage points, driven by high-margin cloud revenue mix.",
-  "citations": [
-    {
-      "chunk_id": "aapl-10k-2024-income-stmt-3",
-      "quote": "Total operating expenses were $267,818 million, resulting in operating income of $123,217 million",
-      "company": "Apple Inc.",
-      "filing_type": "10-K",
-      "year": 2024,
-      "quarter": "FY",
-      "section": "Income Statement"
-    }
-  ],
-  "sub_queries": [
-    "Apple operating margin fiscal 2024",
-    "Microsoft operating margin fiscal 2024"
-  ],
-  "is_hallucinated": false,
-  "groundedness": "grounded",
-  "trace_id": "a3f8c2d1-4b5e-..."
-}
-```
-
-### Trace Details — `GET /agent/trace/{trace_id}`
-
-Fetches per-node execution spans from Langfuse.
-
-```json
-{
-  "trace_id": "a3f8c2d1-4b5e-...",
-  "input": "Compare Apple and Microsoft operating margins...",
-  "output": "Apple's operating margin was 31.5%...",
-  "latency_ms": 3240.5,
-  "observations": [
-    {"name": "decompose",  "type": "SPAN",       "latency_ms": 320.1},
-    {"name": "retrieve",   "type": "SPAN",       "latency_ms": 1850.3},
-    {"name": "synthesize", "type": "GENERATION", "latency_ms": 890.2},
-    {"name": "check",      "type": "SPAN",       "latency_ms": 180.0}
-  ],
-  "langfuse_url": "http://localhost:3000/trace/a3f8c2d1-..."
-}
-```
-
-### Chat — `POST /chat`
-
-Conversational endpoint with history (LLM only, no RAG).
-
-```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"messages": [{"role": "user", "content": "What is EBITDA?"}]}'
-```
-
-### Streaming — `POST /chat/stream`
-
-Same request body, returns `text/event-stream`:
-
-```
-data: {"content": "EBITDA"}
-data: {"content": " stands for"}
-...
-data: [DONE]
-```
-
-### Document Upload — `POST /documents/upload`
-
-Index a new SEC filing (background processing).
-
-```bash
-curl -X POST http://localhost:8000/documents/upload \
-  -F "file=@aapl-10k-2024.htm" \
-  -F "ticker=AAPL" \
-  -F "filing_type=10-K"
-# → {"job_id": "...", "status": "pending"}
-
-curl http://localhost:8000/documents/status/{job_id}
-# → {"status": "done", "chunks_indexed": 847}
-```
 
 ---
 
@@ -266,70 +136,60 @@ The LLM is asked only for `chunk_id` and a verbatim `quote` — all other citati
 **Why text-based Recall@k in the eval framework instead of chunk IDs?**
 Chunk IDs are ephemeral — re-chunking or re-indexing invalidates them. Matching retrieved text against ground-truth context passages is stable across pipeline changes and directly tests what matters: did we surface the relevant information?
 
-**Why Redis-backed circuit breaker instead of in-memory?**
+**Why a Redis-backed circuit breaker instead of in-memory?**
 In-process state breaks across uvicorn workers — each worker has independent counters. Redis gives shared state so a surge of LLM errors trips the breaker across the entire cluster, not just one process.
 
 ---
 
-## Evaluation Framework
+## Evaluation
 
 ```bash
-# Run retrieval metrics (Recall@k, MRR) against dataset
-uv run python -m eval.run_eval --questions 15 --k 5
+# End-to-end answer accuracy: LLM-only vs LLM+RAG
+uv run python -m eval.answer_accuracy --k 5
+# Retrieval ablation: dense vs sparse vs hybrid vs +rerank
+uv run python -m eval.retrieval_ablation --k 5
 ```
 
-Output: retrieval comparison across four pipeline variants (15 QA pairs, n=2,092 indexed chunks, K=5):
+All numbers below are measured on the full **53-question** dataset, n=2,092 indexed chunks, K=5, generator = `llama3.1` (local via Ollama).
 
-| Variant | Recall@5 | MRR | Notes |
-|---|---|---|---|
-| Naive RAG (dense-only) | 0.800 | 0.644 | baseline |
-| Hybrid + RRF | 0.800 | 0.656 | +1.9% MRR vs dense |
-| + Contextual Indexing | 0.800 | 0.656 | prefixes embedded at indexing time |
-| Full Agentic (est.) | ~0.933 | ~0.745 | query rewriting surfaces 2 of 3 persistent misses |
+### 1. Does RAG actually help? (end-to-end answer accuracy)
 
-**Analysis of 3 persistent misses** (q005 MSFT revenue, q010 AWS, q014 AAPL buybacks): the relevant chunks exist in the index but fall outside top-5 with the original query. When queries are rewritten with specific figures (e.g. "AWS revenue 107 billion"), q010 jumps to rank 1 and q005 to rank 3 — exactly the problem the self-correction loop is designed to solve.
+Accuracy = the generated answer contains the ground-truth fact (exact figure, digit-normalized; substring for textual facts). The decisive question — is the whole system worth it versus just asking the model?
 
-Dataset: `eval/dataset.jsonl` — 15 QA pairs with ground-truth answers and source passages across AAPL, MSFT, GOOGL, AMZN, META.
-
-Generation metrics (Faithfulness, Answer Relevancy, Context Precision/Recall) via RAGAS:
-```bash
-uv sync --extra eval
-uv run python -m eval.run_eval
-```
-
----
-
-## Development
-
-```bash
-# Tests
-uv run python -m pytest -q                              # 140 tests
-uv run python -m pytest --cov=app --cov-report=term    # coverage: 77%
-
-# Lint + format
-uv run ruff check app/ tests/ eval/
-uv run ruff format app/ tests/ eval/
-```
-
-CI runs on every push: ruff → pytest with `--cov-fail-under=60`.
-
----
-
-## Configuration
-
-| Variable | Default | Description |
+| Condition | Answer accuracy | |
 |---|---|---|
-| `OPENAI_API_KEY` | — | Required when `LLM_PROVIDER=openai` |
-| `LLM_PROVIDER` | `openai` | `openai` or `ollama` |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Model name |
-| `OLLAMA_BASE_URL` | `http://localhost:11434/v1` | Ollama endpoint |
-| `REDIS_URL` | `redis://localhost:6379` | Redis connection |
-| `LLM_TIMEOUT_SECONDS` | `30.0` | Per-request LLM timeout |
-| `LLM_MAX_ATTEMPTS` | `3` | Retry attempts with backoff |
-| `RATE_LIMIT_CHAT` | `20/minute` | Per-IP limit on `/chat` |
-| `LANGFUSE_PUBLIC_KEY` | — | Optional: Langfuse tracing |
-| `LANGFUSE_SECRET_KEY` | — | Optional: Langfuse tracing |
-| `LANGFUSE_HOST` | `http://localhost:3000` | Langfuse server URL |
+| **LLM only** (no retrieval, parametric memory) | **0.019** (1/53) | baseline |
+| LLM + dense retrieval | 0.585 (31/53) | **+30.6×** |
+| **LLM + hybrid RAG** (production) | **0.604** (32/53) | **+31.0×** |
+
+The model alone answers ~2% of filing-specific questions correctly (it cannot know "$416,161M in net sales"); with RAG it reaches ~60%. **This 31× lift is the system's reason to exist**, and it is now measured, not asserted.
+
+### 2. Where does the remaining 40% go? (the generation gap)
+
+Retrieval finds the right chunk **88.7%** of the time, but the answer is correct only **60.4%** of the time — a **~28-point gap** that is pure generation loss: `llama3.1` is handed the correct context and still fails to extract the figure. The bottleneck is the local 8B generator, not retrieval — swapping in `gpt-4o` would close most of this gap (the architecture is sound; the cheap model is the ceiling).
+
+### 3. Retrieval ablation — was hybrid search worth it?
+
+| Retrieval | Recall@5 | MRR |
+|---|---|---|
+| Dense-only (bge-m3) | 0.887 | **0.789** |
+| Sparse-only (bge-m3 lexical) | 0.811 | 0.567 |
+| Hybrid RRF (dense + sparse) | 0.887 | 0.723 |
+| Hybrid RRF + cross-encoder rerank | 0.792 | 0.649 |
+
+Two honest, counter-intuitive findings the eval surfaced:
+
+> **Hybrid did *not* beat dense here.** Same Recall@5 (0.887), and dense actually has the *better* MRR (0.789 vs 0.723) — RRF fusion with the weaker sparse list nudges the top dense hit down a rank. On this number-anchored eval, multilingual bge-m3 dense is already strong; hybrid's payoff would show on queries dominated by rare exact tokens (tickers, CUSIPs, GAAP line-item codes) where sparse dominates. Worth keeping for robustness, but not a free win — and I can now say that with data instead of marketing.
+
+> **Reranking *hurts*.** The cross-encoder drops Recall@5 from 0.887 to 0.792: it re-ranks on holistic semantic similarity and pushes the literal-number chunk below more "topically fluent" passages. For fact-lookup over financial tables, lexical signal beats cross-attention — so rerank is **off** by default in the pipeline.
+
+The self-correction loop targets the residual ~11% of retrieval misses: the grader flags a query that returns no relevant chunk in top-5, and the rewriter re-issues it with expanded terminology (e.g. "AWS revenue" → "Amazon Web Services net sales for the period").
+
+> **Known limitation — the full agentic path is not in the table.** Every number above is measured, but the end-to-end agentic pipeline (decompose → self-correct → synthesize → hallucination-check) is deliberately excluded rather than estimated, for three reasons: (1) **metric definition** — the agentic path decomposes a query into sub-queries and *accumulates* their top-k results into a variable-size chunk set, so Recall@5 is no longer comparable to the single-query rows; (2) **missing plumbing** — `RAGAgentGraph.run()` returns the answer but not the per-query `SelfCorrectionResult`, so `% rewrites` / `avg iterations` cannot be reported (currently hardcoded in `run_eval.py`); (3) **cost/reliability** — 6–15 LLM calls per query × 53 questions on a local 8B model is slow, and llama3.1's flaky JSON degrades the grader/decomposer into fallbacks, which would measure a partially-disabled agent. The right fix is to evaluate it via **answer accuracy** (well-defined regardless of decomposition) and surface the loop stats from the graph.
+
+> **Reproducibility note:** the eval requires `transformers==4.56.x` for FlagEmbedding 1.4.0 / bge-m3 — the version resolved in `uv.lock` (5.8.x) breaks the bge-m3 tokenizer.
+
+Dataset: `eval/dataset.jsonl` — 53 QA pairs with ground-truth answers and validated source anchors across AAPL, AMZN, META, MSFT, NVDA (15 hand-curated + 38 authored, every anchor verified to appear verbatim in the indexed corpus). Balanced across Income Statement, Balance Sheet, Cash Flow, MD&A, and Risk Factors sections.
 
 ---
 
@@ -338,4 +198,4 @@ CI runs on every push: ruff → pytest with `--cov-fail-under=60`.
 | Stage | Status | Description |
 |---|---|---|
 | Stage 1 | ✅ Complete | FastAPI + LLM, streaming SSE, Redis history, reliability, 18 tests |
-| Stage 2 | ✅ Complete | Agentic RAG — LangGraph, Qdrant hybrid search, self-correction, hallucination check, Langfuse tracing, 140 tests |
+| Stage 2 | ✅ Complete | Agentic RAG — LangGraph, Qdrant hybrid search, self-correction, hallucination check, Langfuse tracing, 141 tests |

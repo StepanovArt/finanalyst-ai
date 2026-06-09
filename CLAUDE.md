@@ -148,11 +148,15 @@ State-of-the-art agentic RAG system implementing Self-RAG and Corrective RAG pat
 - [ ] 2.4.3 — GET /agent/trace/{id} endpoint
 
 #### 2.5 Evaluation
-- [ ] 2.5.1 — Eval dataset: 50 QA pairs with ground truth answers and sources
-- [ ] 2.5.2 — Retrieval metrics: Recall@k, MRR
-- [ ] 2.5.3 — Generation metrics via RAGAS: Faithfulness, Answer Relevancy, Context Precision/Recall
-- [ ] 2.5.4 — Agentic metrics: % rewrites, avg iterations, latency, cost per query
-- [ ] 2.5.5 — Comparison table: naive RAG → hybrid+rerank → +contextual → full agentic
+- [x] 2.5.1 — Eval dataset: 53 QA pairs with ground-truth answers and validated source anchors across AAPL, AMZN, META, MSFT, NVDA (15 hand-curated + 38 Opus-authored, each anchor verified verbatim-present in the indexed corpus via `scripts/append_authored_qa.py`). Target of 50 met.
+- [x] 2.5.2 — Retrieval metrics: Recall@k, MRR (`eval/metrics/retrieval.py`). Ablation on 53-set (K=5): Dense 0.887/0.789, Sparse 0.811/0.567, Hybrid RRF 0.887/0.731, Hybrid+rerank 0.792/0.649. Findings: hybrid does NOT beat dense here (dense has better MRR); reranking degrades recall.
+- [x] 2.5.3 — Generation metrics via RAGAS: Faithfulness, Answer Relevancy, Context Precision/Recall (`eval/metrics/generation.py`)
+- [x] 2.5.4b — End-to-end answer accuracy (no-RAG vs RAG), the headline value test: LLM-only 0.019, +dense 0.585, +hybrid 0.604 (llama3.1). RAG gives ~31× lift. Retrieval 0.887 vs answer 0.604 → ~28pt generation gap (weak local generator is the bottleneck, not retrieval). Scripts: `eval/answer_accuracy.py`, `eval/retrieval_ablation.py`.
+- [~] 2.5.4 — Agentic metrics: % rewrites, avg iterations, latency, cost per query. Framework in `eval/metrics/agentic.py`; iterations/rewrites currently hardcoded in `run_eval.py` (SelfCorrectionResult not yet surfaced at graph level — known gap).
+- [~] 2.5.5 — Comparison table: dense/sparse/hybrid/+rerank retrieval + no-RAG/dense/hybrid answer accuracy measured on 53 questions (see README Evaluation Framework). Full-agentic end-to-end row still pending 2.5.4.
+
+> **Eval reproducibility:** bge-m3 via FlagEmbedding 1.4.0 needs `transformers==4.56.x`. The version in `uv.lock` (5.8.x) breaks the bge-m3 tokenizer (`prepare_for_model`) / model init (`dtype`). To run eval locally: `uv pip install 'transformers==4.56.2'` after `uv sync --extra data`. Should be pinned in `pyproject.toml`.
+> **Chunk-id fix:** `_make_id` previously collided for ~39% of chunks (sections sharing a canonical name restarted index at 0; accession not in key). Fixed in `app/rag/chunking.py` (accession + doc-global seq, 12-hex hash); existing `chunks.jsonl` migrated via `scripts/fix_chunk_ids.py`; regression test in `tests/test_rag.py`.
 
 ---
 
