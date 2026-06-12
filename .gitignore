@@ -54,8 +54,12 @@ data/filings/
 *.safetensors
 checkpoints/
 
-# Node (для Claude Code)
+# Node
 node_modules/
+
+# Claude Code
+CLAUDE.md
+.claude/
 
 # Qdrant data
 qdrant_data/
